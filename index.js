@@ -1,3 +1,5 @@
+const fs = require('fs');
+const oldData = require('./views.json');
 const { google } = require('googleapis');
 const OAuth2 = google.auth.OAuth2;
 
@@ -52,9 +54,11 @@ function updateTitle(auth, views) {
 	try {
 		const auth = getAuth();
 		const views = await getViews(auth);
-		const data = await updateTitle(auth, views);
-		console.log('this video has views-', views);
-		console.log('title-', data);
+		if(oldData.views != views) {
+			await updateTitle(auth, views);
+			oldData.views = views;
+			fs.writeFileSync('./views.json', JSON.stringify(oldData, null, 2));
+		}
 	} catch(err) {
 		console.log(err);
 	}
